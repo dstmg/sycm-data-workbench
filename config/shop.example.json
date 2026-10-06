@@ -1,0 +1,6 @@
+{
+  "configured": false,
+  "configured_shop_code": null,
+  "detected": { "customer": [], "transaction": [], "traffic": [] },
+  "message": "请先核对所有报表是否属于同一店铺。"
+}
