@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>生意参谋数据工作台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">数</div>
+          <div class="brand-copy">
+            <div class="brand-title">生意参谋数据工作台</div>
+            <div class="brand-subtitle">BUSINESS DATA WORKBENCH</div>
+          </div>
+        </div>
+
+        <nav class="navigation">
+          <div class="nav-group">
+            <div class="nav-group-label">工作台</div>
+            <a class="nav-item active" href="/" aria-current="page">
+              <i data-lucide="layout-dashboard" aria-hidden="true"></i><span>经营总览</span>
+            </a>
+            <a class="nav-item" href="/audit.html">
+              <i data-lucide="scan-search" aria-hidden="true"></i><span>数据审计</span>
+            </a>
+            <a class="nav-item" href="/diagnosis.html">
+              <i data-lucide="activity" aria-hidden="true"></i><span>经营诊断</span>
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <div class="nav-group-label">数据模块</div>
+            <div id="moduleNav" class="nav-list" aria-live="polite"></div>
+          </div>
+
+          <div class="nav-group nav-group-bottom">
+            <div class="nav-group-label">系统</div>
+            <a class="nav-item" href="/actions.html">
+              <i data-lucide="list-checks" aria-hidden="true"></i><span>行动追踪</span>
+            </a>
+            <a class="nav-item" href="/system.html">
+              <i data-lucide="settings" aria-hidden="true"></i><span>系统状态</span>
+            </a>
+          </div>
+        </nav>
+
+        <div class="sidebar-status">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="sidebarSyncStatus">本地文件夹已连接</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="mobile-view-switcher" aria-label="移动端导航"><a href="/">总览</a><a href="/diagnosis.html">诊断</a><a href="/actions.html">行动</a><a href="/audit.html">审计</a><a href="/system.html">系统</a></div>
+        <header class="page-header">
+          <div class="header-copy">
+            <div class="eyebrow">经营数据 · 本地实时读取</div>
+            <h1>今天，先看最重要的经营问题</h1>
+            <div class="header-status">
+              <span class="status-pill"><span class="status-dot" aria-hidden="true"></span>本地工作台</span>
+              <span class="status-pill accent" id="homeStatus">正在读取首页数据</span>
+              <span class="status-pill" id="latestDate">数据日期待确认</span>
+            </div>
+            <p class="source-line" id="sourceLine">来源：raw/01-首页 · 经营结论仅使用真实导出数据</p>
+          </div>
+          <div class="header-actions">
+            <span class="sync-label" id="syncStatus">读取中</span>
+            <button class="refresh-button" id="refreshBtn" type="button">
+              <i data-lucide="refresh-cw" aria-hidden="true"></i><span>刷新数据</span>
+            </button>
+          </div>
+        </header>
+
+        <section class="filter-strip" aria-label="经营数据日期筛选">
+          <div class="preset-control" role="group" aria-label="快捷日期范围">
+            <button class="preset-button active" type="button" data-preset="latest">最新一天</button>
+            <button class="preset-button" type="button" data-preset="7d">近7天</button>
+            <button class="preset-button" type="button" data-preset="30d">近30天</button>
+            <button class="preset-button" type="button" data-preset="mtd">本月至今</button>
+            <button class="preset-button" type="button" data-preset="custom">自定义</button>
+          </div>
+          <div class="date-control">
+            <label><span>开始</span><input id="fromDate" type="date" aria-label="开始日期" /></label>
+            <span class="date-separator" aria-hidden="true">至</span>
+            <label><span>结束</span><input id="toDate" type="date" aria-label="结束日期" /></label>
+            <button class="apply-filter-button" id="applyFilterBtn" type="button">
+              <i data-lucide="calendar-check" aria-hidden="true"></i><span>应用</span>
+            </button>
+          </div>
+          <div class="filter-summary">
+            <strong id="filterCaliber">单日真实导出值</strong>
+            <span id="comparisonLabel">自动对比上一周期</span>
+          </div>
+        </section>
+
+        <section id="kpiGrid" class="kpi-grid" aria-label="核心经营指标">
+          <article class="kpi-card is-loading"><span>支付金额</span><strong>读取中</strong></article>
+          <article class="kpi-card is-loading"><span>访客数</span><strong>读取中</strong></article>
+          <article class="kpi-card is-loading"><span>支付转化率</span><strong>读取中</strong></article>
+          <article class="kpi-card is-loading"><span>客单价</span><strong>读取中</strong></article>
+        </section>
+
+        <section class="overview-grid" aria-label="今日经营总览">
+          <article class="work-card focus-card">
+            <div class="card-header">
+              <div><div class="section-kicker">TODAY</div><h2>今日经营焦点</h2></div>
+              <div class="card-header-meta"><span class="card-meta" id="generatedAt">正在生成判断</span><a class="card-meta section-link" href="/diagnosis.html">进入诊断中心</a></div>
+            </div>
+            <div id="focusList" class="focus-list" aria-live="polite">
+              <div class="panel-empty">正在读取真实经营数据</div>
+            </div>
+          </article>
+
+          <article class="work-card attention-card">
+            <div class="card-header">
+              <div><div class="section-kicker">ATTENTION</div><h2>需要你处理</h2></div>
+              <a class="card-meta section-link" href="/actions.html">管理行动状态</a>
+            </div>
+            <ol id="nextSteps" class="attention-list" aria-live="polite">
+              <li class="panel-empty">等待经营判断</li>
+            </ol>
+          </article>
+        </section>
+
+        <section class="analysis-grid" aria-label="趋势与经营链路">
+          <article class="work-card chart-card">
+            <div class="card-header compact-header">
+              <div><div class="section-kicker">PERIOD TREND</div><h2>净支付金额趋势</h2></div>
+              <span class="card-meta" id="trendLabel">最近 30 个自然日</span>
+            </div>
+            <div class="chart-wrap"><canvas id="revenueChart" aria-label="净支付金额趋势图"></canvas></div>
+          </article>
+
+          <article class="work-card benchmark-card">
+            <div class="card-header compact-header">
+              <div><div class="section-kicker">PEER BENCHMARK</div><h2>本店与同行对标</h2></div>
+              <span class="card-meta">本店 / 平均 / 优秀</span>
+            </div>
+            <div id="benchmarkList" class="benchmark-list" aria-live="polite"></div>
+          </article>
+        </section>
+
+        <section class="work-card funnel-panel" aria-label="经营漏斗与影响估算">
+          <div class="card-header compact-header">
+            <div><div class="section-kicker">CONVERSION FUNNEL</div><h2>访客到支付漏斗</h2></div>
+            <span class="card-meta" id="funnelCaliber">单日真实人数</span>
+          </div>
+          <div class="funnel-layout">
+            <div id="funnelStages" class="funnel-stages" aria-live="polite"></div>
+            <div class="impact-panel">
+              <span>转化率达到同行平均的静态影响</span>
+              <strong id="impactAmount">正在计算</strong>
+              <p id="impactDetail">基于当前流量与客单价估算</p>
+            </div>
+          </div>
+        </section>
+
+        <details class="data-details">
+          <summary>
+            <div><span class="section-kicker">DATA STATUS</span><strong>数据接入与来源</strong></div>
+            <span id="coverageSummary">固定目录自动读取</span>
+          </summary>
+
+          <section class="coverage-section">
+            <div class="section-heading">
+              <div><div class="section-kicker">DATA COVERAGE</div><h2>数据覆盖</h2></div>
+              <div class="directory-status">
+                <i data-lucide="folder-sync" aria-hidden="true"></i><span>固定目录自动读取</span>
+              </div>
+            </div>
+            <div id="moduleList" class="coverage-grid" aria-live="polite"></div>
+          </section>
+
+          <section class="file-panel">
+            <div class="card-header compact-header">
+              <div><div class="section-kicker">SOURCE TRACE</div><h2>首页文件同步状态</h2></div>
+              <span class="card-meta" id="sourceCount">ZIP 原始包</span>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th>原始文件</th><th>类型</th><th>大小</th><th>修改时间</th><th>解析结果</th></tr></thead>
+                <tbody id="homeFileRows"><tr class="empty-row"><td colspan="5">正在读取原始文件</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+        </details>
+      </main>
+    </div>
+
+    <script src="./vendor/lucide.min.js"></script>
+    <script src="./vendor/chart.umd.js"></script>
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>专题分析 · 生意参谋数据工作台</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand brand-link" href="/" aria-label="返回首页">
+        <span class="brand-mark">参</span>
+        <span class="brand-copy">
+          <span class="brand-title">生意参谋数据工作台</span>
+          <span class="brand-subtitle">BUSINESS ANALYTICS WORKSPACE</span>
+        </span>
+      </a>
+      <nav class="navigation" aria-label="数据工作台导航">
+        <div class="nav-group">
+          <div class="nav-group-label">工作台</div>
+          <div class="nav-list" id="moduleNav">
+            <a class="nav-item" href="/"><i data-lucide="house"></i><span>首页</span><span class="nav-count">3</span></a>
+            <a class="nav-item" href="/diagnosis.html"><i data-lucide="activity"></i><span>经营诊断</span></a>
+            <a class="nav-item" data-module="transaction" href="/transaction.html"><i data-lucide="receipt-text"></i><span>交易</span><span class="nav-count">5</span></a>
+            <a class="nav-item" data-module="traffic" href="/traffic.html"><i data-lucide="route"></i><span>流量</span><span class="nav-count">4</span></a>
+            <a class="nav-item" data-module="customer" href="/customer.html"><i data-lucide="users"></i><span>客户</span><span class="nav-count">3</span></a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <div class="nav-group-label">待接入模块</div>
+          <div class="nav-list">
+            <span class="nav-item nav-item-disabled"><i data-lucide="package-search"></i><span>商品</span><span class="nav-count">0</span></span>
+            <span class="nav-item nav-item-disabled"><i data-lucide="badge-percent"></i><span>营销</span><span class="nav-count">0</span></span>
+            <span class="nav-item nav-item-disabled"><i data-lucide="chart-no-axes-combined"></i><span>市场</span><span class="nav-count">0</span></span>
+          </div>
+        </div>
+        <div class="nav-group nav-group-bottom">
+          <div class="nav-group-label">系统</div>
+          <div class="nav-list">
+            <a class="nav-item" href="/actions.html"><i data-lucide="list-checks"></i><span>行动追踪</span></a>
+            <a class="nav-item" href="/audit.html"><i data-lucide="scan-search"></i><span>数据审计</span></a>
+            <a class="nav-item" href="/system.html"><i data-lucide="settings"></i><span>系统状态</span></a>
+          </div>
+        </div>
+      </nav>
+      <div class="sidebar-status"><span class="status-dot"></span><span id="sidebarStatus">读取本地真实数据</span></div>
+    </aside>
+
+    <main class="main module-main">
+      <div class="mobile-view-switcher" aria-label="移动端导航"><a href="/">总览</a><a href="/diagnosis.html">诊断</a><a href="/transaction.html">交易</a><a href="/traffic.html">流量</a><a href="/customer.html">客户</a><a href="/actions.html">行动</a></div>
+      <header class="page-header module-page-header">
+        <div class="header-copy">
+          <p class="eyebrow" id="eyebrow">经营数据 · 本地实时读取</p>
+          <h1 id="pageTitle">专题分析</h1>
+          <div class="header-status">
+            <span class="status-pill accent" id="dataStatus">正在读取</span>
+            <span class="status-pill" id="coverageStatus">核对数据范围</span>
+          </div>
+          <p class="source-line" id="sourceLine">只分析原始 ZIP 中已经存在的数据。</p>
+        </div>
+        <div class="header-actions">
+          <span class="sync-label" id="syncStatus">准备就绪</span>
+          <button class="refresh-button" id="refreshBtn" type="button" title="重新扫描本地数据">
+            <i data-lucide="refresh-cw" aria-hidden="true"></i><span>刷新数据</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="filter-strip" aria-label="日期筛选">
+        <div class="preset-control" aria-label="快捷日期">
+          <button class="preset-button active" type="button" data-preset="latest">最新周期</button>
+          <button class="preset-button" type="button" data-preset="7d">近 7 天</button>
+          <button class="preset-button" type="button" data-preset="30d">近 30 天</button>
+          <button class="preset-button" type="button" data-preset="month">本月</button>
+        </div>
+        <div class="date-control">
+          <label>开始日期<input id="fromDate" type="date"></label>
+          <span class="date-separator">至</span>
+          <label>结束日期<input id="toDate" type="date"></label>
+          <button class="apply-filter-button" id="applyFilterBtn" type="button"><i data-lucide="calendar-check"></i><span>应用</span></button>
+        </div>
+        <div class="filter-summary">
+          <strong id="filterSummary">等待选择周期</strong>
+          <span id="filterCaliber">读取后显示指标口径</span>
+        </div>
+      </section>
+
+      <div class="module-period-note" id="periodNote" hidden></div>
+
+      <section class="kpi-grid" id="kpiGrid" aria-label="核心指标"></section>
+
+      <section class="overview-grid">
+        <article class="work-card">
+          <header class="card-header">
+            <div><p class="section-kicker">自动诊断</p><h2>经营判断</h2></div>
+            <span class="card-meta">证据与口径可追溯</span>
+          </header>
+          <div class="focus-list" id="findingList"></div>
+        </article>
+        <article class="work-card">
+          <header class="card-header">
+            <div><p class="section-kicker">转成行动</p><h2>需要处理</h2></div>
+            <span class="card-meta">按优先级排序</span>
+          </header>
+          <ol class="attention-list" id="actionList"></ol>
+        </article>
+      </section>
+
+      <section class="analysis-grid module-analysis-grid">
+        <article class="work-card">
+          <header class="card-header compact-header">
+            <div><p class="section-kicker">时间变化</p><h2 id="trendTitle">指标趋势</h2></div>
+            <span class="card-meta" id="trendCaliber"></span>
+          </header>
+          <div class="chart-wrap module-chart-wrap"><canvas id="trendChart"></canvas></div>
+        </article>
+        <article class="work-card">
+          <header class="card-header compact-header">
+            <div><p class="section-kicker">贡献结构</p><h2 id="compositionTitle">结构分析</h2></div>
+            <span class="card-meta" id="compositionCaliber"></span>
+          </header>
+          <div class="structure-list" id="compositionList"></div>
+        </article>
+      </section>
+
+      <section class="work-card secondary-panel">
+        <header class="card-header compact-header">
+          <div><p class="section-kicker">补充证据</p><h2 id="secondaryTitle">补充分析</h2></div>
+          <span class="card-meta" id="secondaryCaliber"></span>
+        </header>
+        <div class="secondary-layout">
+          <div class="chart-wrap secondary-chart-wrap"><canvas id="secondaryChart"></canvas></div>
+          <div class="structure-list compact-structure-list" id="secondaryList"></div>
+        </div>
+      </section>
+
+      <details class="data-details" id="detail" open>
+        <summary><div><i data-lucide="table-properties"></i><strong id="detailTitle">数据明细</strong></div><span>表格用于追溯，不代替诊断</span></summary>
+        <div class="table-scroll">
+          <table><thead id="detailHead"></thead><tbody id="detailBody"></tbody></table>
+        </div>
+        <p class="table-note" id="detailNote"></p>
+      </details>
+
+      <details class="data-details source-audit-details">
+        <summary><div><i data-lucide="database"></i><strong>来源与口径</strong></div><span id="sourceCount">等待读取</span></summary>
+        <div class="source-audit-list" id="sourceList"></div>
+      </details>
+    </main>
+  </div>
+
+  <script src="/vendor/lucide.min.js"></script>
+  <script src="/vendor/chart.umd.js"></script>
+  <script src="/module.js"></script>
+</body>
+</html>

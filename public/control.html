@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>经营诊断 · 生意参谋数据工作台</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand brand-link" href="/" aria-label="返回首页">
+        <span class="brand-mark">数</span>
+        <span class="brand-copy"><span class="brand-title">生意参谋数据工作台</span><span class="brand-subtitle">BUSINESS DATA WORKBENCH</span></span>
+      </a>
+      <nav class="navigation" aria-label="数据工作台导航">
+        <div class="nav-group">
+          <div class="nav-group-label">工作台</div>
+          <div class="nav-list">
+            <a class="nav-item" data-view="home" href="/"><i data-lucide="layout-dashboard"></i><span>经营总览</span></a>
+            <a class="nav-item" data-view="audit" href="/audit.html"><i data-lucide="scan-search"></i><span>数据审计</span></a>
+            <a class="nav-item" data-view="diagnosis" href="/diagnosis.html"><i data-lucide="activity"></i><span>经营诊断</span></a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <div class="nav-group-label">数据模块</div>
+          <div class="nav-list">
+            <a class="nav-item" href="/transaction.html"><i data-lucide="receipt-text"></i><span>交易</span></a>
+            <a class="nav-item" href="/traffic.html"><i data-lucide="route"></i><span>流量</span></a>
+            <a class="nav-item" href="/customer.html"><i data-lucide="users"></i><span>客户</span></a>
+          </div>
+        </div>
+        <div class="nav-group nav-group-bottom">
+          <div class="nav-group-label">系统</div>
+          <div class="nav-list">
+            <a class="nav-item" data-view="actions" href="/actions.html"><i data-lucide="list-checks"></i><span>行动追踪</span></a>
+            <a class="nav-item" data-view="system" href="/system.html"><i data-lucide="settings"></i><span>系统状态</span></a>
+          </div>
+        </div>
+      </nav>
+      <div class="sidebar-status"><span class="status-dot"></span><span id="sidebarStatus">读取本地真实数据</span></div>
+    </aside>
+
+    <main class="main control-main">
+      <div class="mobile-view-switcher" aria-label="移动端导航">
+        <a href="/">总览</a><a href="/diagnosis.html">诊断</a><a href="/actions.html">行动</a><a href="/audit.html">审计</a><a href="/system.html">系统</a>
+      </div>
+      <header class="page-header control-header">
+        <div class="header-copy">
+          <p class="eyebrow" id="viewEyebrow">经营数据 · 自动诊断</p>
+          <h1 id="viewTitle">经营诊断中心</h1>
+          <div class="header-status"><span class="status-pill accent" id="viewStatus">正在读取</span><span class="status-pill" id="viewPeriod">核对真实数据周期</span></div>
+          <p class="source-line" id="viewDescription">诊断结论均可追溯到原始文件、工作簿、工作表和字段口径。</p>
+        </div>
+        <div class="header-actions">
+          <span class="sync-label" id="syncStatus">准备就绪</span>
+          <button class="refresh-button" id="refreshBtn" type="button"><i data-lucide="refresh-cw"></i><span>刷新</span></button>
+        </div>
+      </header>
+      <section id="controlToolbar"></section>
+      <section id="controlContent" aria-live="polite"><div class="panel-empty">正在读取真实数据</div></section>
+    </main>
+  </div>
+  <script src="/vendor/lucide.min.js"></script>
+  <script src="/control.js" type="module"></script>
+</body>
+</html>
