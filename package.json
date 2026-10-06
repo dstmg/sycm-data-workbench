@@ -1,0 +1,17 @@
+{
+  "name": "sycm-data-workbench",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "audit": "node server.mjs --audit",
+    "test": "node scripts/empty_smoke_test.mjs",
+    "test:empty": "node scripts/empty_smoke_test.mjs",
+    "test:dataset": "node scripts/smoke_test.mjs"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.9",
+    "lucide": "^0.468.0"
+  }
+}
