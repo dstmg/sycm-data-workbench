@@ -68,7 +68,8 @@ const system = await getJson("/api/system");
 assert.equal(system.status, "ready");
 assert.ok(system.startup.exists);
 assert.equal(system.data.normalized.filter((item) => item.exists).length, 4);
-assert.ok(system.reports.some((item) => item.name.includes("01-首页数据审计")));
+// Runtime-generated summary is required; old manually authored audit documents are not.
+assert.ok((await fs.stat(path.join(rootDir, "reports", "homepage-summary.json"))).size > 0);
 
 for (const page of ["/", "/transaction.html", "/traffic.html", "/customer.html", "/diagnosis.html", "/actions.html", "/audit.html", "/system.html"]) {
   const html = await getText(page);

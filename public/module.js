@@ -49,8 +49,9 @@ function shiftDate(value, days) {
 
 function setBusy(busy) {
   el.refreshBtn.disabled = busy;
-  el.applyFilterBtn.disabled = busy;
-  presetButtons.forEach((button) => { button.disabled = busy; });
+  el.applyFilterBtn.disabled = busy || !dataCache;
+  for (const input of [el.fromDate, el.toDate]) input.disabled = busy || !dataCache;
+  presetButtons.forEach((button) => { button.disabled = busy || !dataCache; });
   if (busy) {
     el.syncStatus.textContent = "正在计算";
     el.dataStatus.textContent = "读取真实数据";
@@ -167,6 +168,7 @@ function renderTrend(trend) {
       }))
     },
     options: {
+      animation: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
       maintainAspectRatio: false,
       interaction: { mode: "index", intersect: false },
       plugins: { legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 8 } } },
@@ -193,6 +195,7 @@ function renderSecondaryChart(rows) {
       datasets: [{ label: "当前值", data: shown.map((row) => row.value), backgroundColor: cssToken("--accent-soft"), borderColor: cssToken("--accent"), borderWidth: 1 }]
     },
     options: {
+      animation: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
       indexAxis: "y",
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
@@ -263,6 +266,9 @@ function render(data) {
 }
 
 async function loadData(from, to) {
+  document.title = `${moduleMeta[pageModule].title} · 生意参谋数据工作台`;
+  el.pageTitle.textContent = moduleMeta[pageModule].title;
+  document.querySelector(`[data-module="${pageModule}"]`)?.classList.add("active");
   setBusy(true);
   try {
     const params = from && to ? `?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}` : "";
@@ -270,7 +276,20 @@ async function loadData(from, to) {
     const data = await response.json();
     if (!response.ok || data.status === "error") throw new Error(data.detail || data.message || "数据读取失败");
     if (data.status === "waiting") {
+      dataCache = null;
+      destroyCharts();
+      el.pageTitle.textContent = moduleMeta[pageModule].title;
       el.dataStatus.textContent = "等待导入";
+      el.syncStatus.textContent = "等待导入";
+      el.sidebarStatus.textContent = "尚无专题分析数据";
+      el.coverageStatus.textContent = "尚无可分析日期";
+      el.filterSummary.textContent = "尚无可分析周期";
+      el.filterCaliber.textContent = "导入后选择日期";
+      el.fromDate.value = el.toDate.value = "";
+      el.kpiGrid.innerHTML = '<div class="panel-empty">尚无兼容报表 · 缺失数据不代表 0</div>';
+      el.findingList.innerHTML = '<div class="panel-empty">导入后生成分析。<a href="/#importGuide">查看导入指南</a></div>';
+      el.actionList.innerHTML = '<div class="panel-empty">暂无可生成的行动</div>';
+      el.compositionList.innerHTML = el.secondaryList.innerHTML = '<div class="panel-empty">等待真实数据</div>';
       el.periodNote.hidden = false;
       el.periodNote.textContent = data.message;
       return;
@@ -282,7 +301,7 @@ async function loadData(from, to) {
     el.dataStatus.textContent = "读取失败";
     el.syncStatus.textContent = "需要检查";
     el.periodNote.hidden = false;
-    el.periodNote.textContent = error.message;
+    el.periodNote.textContent = `本次读取失败：${error.message}。已有内容未更新，请检查本地服务、ZIP 格式与数据审计后刷新。`;
     console.error(error);
   } finally {
     setBusy(false);

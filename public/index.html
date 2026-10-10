@@ -49,7 +49,7 @@
 
         <div class="sidebar-status">
           <span class="status-dot" aria-hidden="true"></span>
-          <span id="sidebarSyncStatus">本地文件夹已连接</span>
+          <span id="sidebarSyncStatus">正在检查本地数据</span>
         </div>
       </aside>
 
@@ -58,7 +58,7 @@
         <header class="page-header">
           <div class="header-copy">
             <div class="eyebrow">经营数据 · 本地实时读取</div>
-            <h1>今天，先看最重要的经营问题</h1>
+            <h1>经营总览</h1>
             <div class="header-status">
               <span class="status-pill"><span class="status-dot" aria-hidden="true"></span>本地工作台</span>
               <span class="status-pill accent" id="homeStatus">正在读取首页数据</span>
@@ -74,6 +74,20 @@
           </div>
         </header>
 
+        <details class="import-guide" id="importGuide">
+          <summary>首次使用 / 导入报表指南</summary>
+          <div class="import-guide-body">
+            <p>使用本人有权访问的导出报表；同一项目只放同一家店铺的数据。</p>
+            <ol>
+              <li>从生意参谋导出原始 ZIP，保留文件内部的表头与列顺序。</li>
+              <li>首页放入 <code>raw/01-首页</code>；交易、流量、客户分别放入 <code>raw/02-交易</code>、<code>raw/03-流量</code>、<code>raw/04-客户</code>。这些路径都在当前项目文件夹内。</li>
+              <li>点击右上角“刷新数据”，再到 <a href="/audit.html">数据审计</a> 核对文件、日期与解析状态。</li>
+            </ol>
+            <p>商品、营销、服务、内容、市场和业务专区目前仅提供归档入口，不代表已实现分析。缺失值不等于 0，经营诊断也不等于已证实的原因。</p>
+            <p>还没有报表？可以先看 <a href="/demo.html">独立演示（合成数据，不影响真实数据）</a>。</p>
+          </div>
+        </details>
+        <div id="loadError" class="notice-error" role="alert" hidden></div>
         <section class="filter-strip" aria-label="经营数据日期筛选">
           <div class="preset-control" role="group" aria-label="快捷日期范围">
             <button class="preset-button active" type="button" data-preset="latest">最新一天</button>

@@ -150,7 +150,10 @@ function renderSystem(data) {
 async function loadSystem() { setBusy(true); try { renderSystem(await fetch("/api/system", { cache: "no-store" }).then(checkJson)); } catch (error) { renderError(error); } finally { setBusy(false); } }
 async function checkJson(response) { const data = await response.json(); if (!response.ok) throw new Error(data.detail || data.message || `接口返回 ${response.status}`); return data; }
 function renderError(error) { el.status.textContent = "读取失败"; el.sync.textContent = "需要检查"; el.content.innerHTML = `<div class="panel-empty">${escapeHtml(error.message)}</div>`; }
-function setBusy(busy) { el.refresh.disabled = busy; el.sync.textContent = busy ? "正在读取" : "真实数据已更新"; }
+function setBusy(busy) {
+  el.refresh.disabled = busy;
+  el.sync.textContent = busy ? "正在读取" : el.status.textContent === "读取失败" ? "需要检查" : el.status.textContent === "等待导入" ? "等待导入" : "本地读取完成";
+}
 
 const current = meta[view];
 document.title = `${current.title} · 生意参谋数据工作台`;

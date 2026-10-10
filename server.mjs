@@ -128,6 +128,17 @@ export async function buildAudit() {
   };
 }
 
+async function archiveFingerprint(paths) {
+  const digest = createHash("sha256");
+  for (const filename of [...paths].sort()) {
+    const stat = await fs.stat(filename, { bigint: true });
+    digest.update(path.basename(filename));
+    digest.update(String(stat.size));
+    digest.update(String(stat.mtimeNs));
+  }
+  return digest.digest("hex");
+}
+
 async function ensureHomepageSummary() {
   const entries = await fs.readdir(path.join(rawDir, "01-首页"), { withFileTypes: true }).catch(() => []);
   const archivePaths = entries
@@ -152,8 +163,10 @@ async function ensureHomepageSummary() {
   const scriptStat = await fs.stat(homepageScript);
   const newestInput = Math.max(scriptStat.mtimeMs, ...sourceStats.map((stat) => stat.mtimeMs));
   const summaryStat = await fs.stat(homepageSummaryPath).catch(() => null);
+  const cached = await fs.readFile(homepageSummaryPath, "utf8").then(JSON.parse).catch(() => null);
+  const fingerprint = await archiveFingerprint(archivePaths);
 
-  if (!summaryStat || summaryStat.mtimeMs < newestInput) {
+  if (!summaryStat || summaryStat.mtimeMs < newestInput || cached?.source_fingerprint !== fingerprint) {
     if (!homepageBuildPromise) {
       homepageBuildPromise = execFileAsync("python", [homepageScript], {
         cwd: rootDir,
@@ -323,13 +336,16 @@ async function ensureBusinessData() {
 
   for (const [folder, outputName] of definitions) {
     const entries = await fs.readdir(path.join(rawDir, folder), { withFileTypes: true }).catch(() => []);
+    const archivePaths = [];
     for (const entry of entries) {
       if (!entry.isFile() || path.extname(entry.name).toLowerCase() !== ".zip") continue;
+      archivePaths.push(path.join(rawDir, folder, entry.name));
       const stat = await fs.stat(path.join(rawDir, folder, entry.name));
       newestInput = Math.max(newestInput, stat.mtimeMs);
     }
     const outputStat = await fs.stat(path.join(rootDir, "normalized", outputName)).catch(() => null);
-    if (!outputStat || outputStat.mtimeMs < newestInput) needsBuild = true;
+    const cached = await fs.readFile(path.join(rootDir, "normalized", outputName), "utf8").then(JSON.parse).catch(() => null);
+    if (!outputStat || outputStat.mtimeMs < newestInput || cached?.source_fingerprint !== await archiveFingerprint(archivePaths)) needsBuild = true;
   }
 
   if (needsBuild) {
@@ -532,5 +548,13 @@ if (process.argv.includes("--audit")) {
     await sendStatic(req, res);
   }).listen(port, "127.0.0.1", () => {
     console.log(`生意参谋数据工作台已启动: http://127.0.0.1:${server.address().port}`);
+  });
+  server.on("error", (error) => {
+    if (error.code === "EADDRINUSE") {
+      console.error(`端口 ${port} 已被占用。请关闭旧工作台，或在 PowerShell 中设置 $env:PORT = '5178' 后重试。`);
+    } else {
+      console.error("本地服务启动失败:", error.message);
+    }
+    process.exitCode = 1;
   });
 }

@@ -99,14 +99,19 @@ function dateShift(value, days) {
 }
 
 function setActivePreset(name) {
-  presetButtons.forEach((button) => button.classList.toggle("active", button.dataset.preset === name));
+  presetButtons.forEach((button) => {
+    const active = button.dataset.preset === name;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
 }
 
 function setBusy(busy) {
   elements.refreshBtn.disabled = busy;
-  elements.applyFilterBtn.disabled = busy;
+  elements.applyFilterBtn.disabled = busy || !availableTo;
+  for (const input of [elements.fromDate, elements.toDate]) input.disabled = busy || !availableTo;
   presetButtons.forEach((button) => {
-    button.disabled = busy;
+    button.disabled = busy || !availableTo;
   });
   if (busy) elements.syncStatus.textContent = "计算中";
 }
@@ -126,7 +131,7 @@ function renderNav(modules) {
       </a>` : `
       <span class="nav-item nav-item-disabled" title="${escapeHtml(item.description)}">
         <i data-lucide="${moduleIcons[item.folder] || "folder"}" aria-hidden="true"></i>
-        <span>${escapeHtml(item.label)}</span><span class="nav-count">${item.fileCount}</span>
+        <span>${escapeHtml(item.label)} · 仅归档</span><span class="nav-count">${item.fileCount}</span>
       </span>`)
     .join("");
 }
@@ -135,7 +140,8 @@ function renderModules(modules) {
   elements.moduleList.innerHTML = modules
     .map((item) => {
       const ready = item.fileCount > 0;
-      const statusText = item.folder === "01-首页" && ready ? "已解析并诊断" : ready ? "真实文件已识别" : "等待真实数据";
+      const supported = ["01-首页", "02-交易", "03-流量", "04-客户"].includes(item.folder);
+      const statusText = !supported ? "仅归档 · 未接入分析" : ready ? "文件已识别 · 解析见审计" : "等待导入 ZIP";
       return `
         <div class="module-row">
           <div class="module-heading">
@@ -284,6 +290,7 @@ function renderChart(trend) {
       }]
     },
     options: {
+      animation: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
       responsive: true,
       maintainAspectRatio: false,
       interaction: { intersect: false, mode: "index" },
@@ -323,7 +330,7 @@ function renderReady(homepage) {
   elements.homeStatus.textContent = "首页数据已解析";
   elements.latestDate.textContent = selection.date_from === selection.date_to ? `统计 ${selection.date_to}` : `统计 ${selection.date_from} 至 ${selection.date_to}`;
   elements.syncStatus.textContent = "真实数据已更新";
-  elements.sidebarSyncStatus.textContent = "本地文件实时同步";
+  elements.sidebarSyncStatus.textContent = "本地数据已读取";
   elements.generatedAt.textContent = `判断更新于 ${formatTime(homepage.generated_at)}`;
   elements.sourceLine.textContent = `可选日期 ${selection.available_from} 至 ${selection.available_to} · 当前 ${selection.caliber}`;
   elements.coverageSummary.textContent = `首页 ${quality.daily_unique_dates} 个日周期 / ${quality.monthly_unique_dates} 个月周期`;
@@ -343,12 +350,41 @@ function renderReady(homepage) {
 
 function renderFailure(message) {
   elements.syncStatus.textContent = "读取失败";
-  elements.homeStatus.textContent = "日期计算异常";
-  elements.focusList.innerHTML = `<div class="panel-empty">${escapeHtml(message)}</div>`;
+  elements.homeStatus.textContent = "数据未更新";
+  elements.sidebarSyncStatus.textContent = "读取异常 · 请检查";
+  const notice = document.querySelector("#loadError");
+  notice.hidden = false;
+  notice.textContent = `本次读取失败：${message}。已有内容未更新，请勿作为本次结果使用。请确认本地服务仍在运行，并到数据审计核对 ZIP 格式后重试。`;
+}
+
+function renderWaiting() {
+  availableFrom = availableTo = null;
+  elements.fromDate.value = elements.toDate.value = "";
+  elements.syncStatus.textContent = "等待导入";
+  elements.homeStatus.textContent = "尚无首页数据";
+  elements.sidebarSyncStatus.textContent = "等待首页 ZIP";
+  elements.latestDate.textContent = "尚无可分析日期";
+  elements.generatedAt.textContent = "导入后生成判断";
+  elements.filterCaliber.textContent = "尚无可分析周期";
+  elements.comparisonLabel.textContent = "导入后选择日期";
+  elements.sourceLine.textContent = "来源：项目内 raw/01-首页 · 请先导入兼容的原始 ZIP";
+  elements.coverageSummary.textContent = "尚无首页分析数据";
+  document.querySelector("#importGuide").open = true;
+  elements.kpiGrid.innerHTML = ["支付金额", "访客数", "支付转化率", "客单价"].map((label) => `<article class="kpi-card"><span>${label}</span><strong>—</strong><div class="kpi-meta">未导入，不代表 0</div></article>`).join("");
+  elements.focusList.innerHTML = '<div class="panel-empty">导入首页 ZIP 后显示经营焦点，操作步骤见上方指南。</div>';
+  elements.nextSteps.innerHTML = '<li class="panel-empty">暂无可生成的行动</li>';
+  elements.benchmarkList.innerHTML = '<div class="panel-empty">等待本店与同行数据</div>';
+  elements.funnelStages.innerHTML = '<div class="panel-empty">等待访客与支付数据</div>';
+  elements.impactAmount.textContent = "—";
+  elements.impactDetail.textContent = "数据不足，不做影响估算";
+  elements.trendLabel.textContent = "等待可分析周期";
+  if (revenueChart) { revenueChart.destroy(); revenueChart = null; }
+  renderSources([]);
 }
 
 async function loadPeriod(dateFrom = null, dateTo = null, refreshAudit = false) {
   setBusy(true);
+  document.querySelector("#loadError").hidden = true;
   try {
     if (!auditCache || refreshAudit) {
       const auditResponse = await fetch(`/api/audit?t=${Date.now()}`, { cache: "no-store" });
@@ -362,9 +398,7 @@ async function loadPeriod(dateFrom = null, dateTo = null, refreshAudit = false) 
     const homepage = await response.json();
     if (!response.ok) throw new Error(homepage.detail || `首页接口返回 ${response.status}`);
     if (homepage.status === "waiting") {
-      elements.syncStatus.textContent = "等待导入";
-      elements.homeStatus.textContent = "尚无首页数据";
-      elements.focusList.innerHTML = '<div class="panel-empty">请将本人有权使用的生意参谋首页导出 ZIP 放入项目的 raw/01-首页 文件夹，然后点击刷新。未导入前不会生成经营结论。</div>';
+      renderWaiting();
       return;
     }
     if (homepage.status !== "ready") throw new Error("等待首页真实 ZIP 数据");

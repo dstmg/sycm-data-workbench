@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>独立演示 · 生意参谋数据工作台</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="main" style="margin-left:0;width:100%;margin-inline:auto">
+    <header class="page-header">
+      <div class="header-copy"><div class="eyebrow">DEMO · 合成数据 / 非真实经营结果</div><h1>经营总览 · 独立演示</h1><p class="source-line">仅展示信息布局与判断链路，不读取、写入或替换本地报表。</p></div>
+      <a class="refresh-button" href="/">返回真实工作台</a>
+    </header>
+    <section class="kpi-grid" aria-label="虚构演示指标">
+      <article class="kpi-card"><span>支付金额 · 演示日</span><strong>¥12,480</strong><p class="kpi-meta">虚构示例，不是实际业绩</p></article>
+      <article class="kpi-card"><span>访客数 · 演示日</span><strong>2,600</strong><p class="kpi-meta">虚构示例</p></article>
+      <article class="kpi-card"><span>支付转化率 · 演示日</span><strong>4.00%</strong><p class="kpi-meta">104 位支付买家 / 2,600 位访客</p></article>
+      <article class="kpi-card"><span>客单价 · 演示日</span><strong>¥120</strong><p class="kpi-meta">¥12,480 / 104 位支付买家</p></article>
+    </section>
+    <section class="overview-grid" aria-label="演示判断与行动">
+      <article class="work-card"><div class="card-header"><div><div class="section-kicker">EVIDENCE</div><h2>示例判断链路</h2></div><span class="card-meta">全部为合成场景</span></div>
+        <div class="focus-item"><span class="item-marker warning"></span><div><strong>支付金额下降，先分辨流量与转化</strong><p>假设上一日访客 3,000 人、转化率 4%、客单价 ¥120；当日访客减少至 2,600，另外两项不变。这个示例只能说明流量减少，不能证明减少的原因。</p><ul class="evidence-list"><li>上一日虚构支付金额：¥14,400</li><li>当日虚构支付金额：¥12,480，减少 ¥1,920</li><li>原因仍需核对来源、活动与商品报表</li></ul></div><span class="focus-state warning">待验证</span></div>
+      </article>
+      <article class="work-card"><div class="card-header"><div><div class="section-kicker">ACTION</div><h2>下一步怎么查</h2></div></div><ol class="attention-list"><li class="attention-item"><div><strong>核对流量来源</strong><p>确认减少来自哪一渠道，再判断需要调整的动作。没有对应报表时保留为假设。</p><span class="action-target">演示行动 · 不会保存</span></div><span class="attention-state medium">待处理</span></li></ol></article>
+    </section>
+    <p class="source-line">真实模式不会自动加载这些数据。实际界面内容、指标和诊断由你导入的兼容报表决定。</p>
+  </main>
+</body>
+</html>
